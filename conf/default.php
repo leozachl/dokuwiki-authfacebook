@@ -2,5 +2,6 @@
 
 $conf['applicationID'] = '';
 $conf['applicationSecret'] = '';
-$conf['superuser'] = '';
+$conf['superuser'] = '[]';
+$conf['fbgid2group'] = '{}';
 $conf['defaultgroup'] = 'facebook';
