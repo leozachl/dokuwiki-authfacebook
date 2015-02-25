@@ -1,0 +1,7 @@
+base   authfacebook
+author Leo Zachl
+email  leo.zachl@gmail.com
+date   2014-02-24
+name   Facebook login
+desc   Plugin to get authentication and groups from Facebook
+url    http://www.dokuwiki.org/plugin:authfacebook

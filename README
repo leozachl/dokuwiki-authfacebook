@@ -1,0 +1,6 @@
+Facebook auth login plugin
+
+lib/facebook.php and lib/base_facebook.php are file obtained from https://github.com/facebook/facebook-php-sdk/ (/src/*.php)
+
+
+
