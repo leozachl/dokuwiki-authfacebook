@@ -1,4 +1,6 @@
-Facebook auth login plugin
+A Dokuwiki auth plugin for login via Facebook
+
+Doku at https://www.dokuwiki.org/plugin:authfacebook
 
 lib/facebook.php and lib/base_facebook.php are file obtained from https://github.com/facebook/facebook-php-sdk/ (/src/*.php)
 
