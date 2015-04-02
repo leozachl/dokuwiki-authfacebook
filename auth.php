@@ -146,7 +146,7 @@ class auth_plugin_authfacebook extends auth_plugin_authplain {
           'redirect_uri' => wl('start',array('do'=>'login'),true, '&'),
           'canvas'    => 0,
           'fbconnect' => 1,
-          'scope' => 'user_groups,read_stream,publish_stream,user_photos,friends_photos'   //for future usage
+          'scope' => $this->getConf('scope')
         )
       );
     }
