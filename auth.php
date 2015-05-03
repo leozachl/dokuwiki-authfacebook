@@ -68,11 +68,11 @@ class auth_plugin_authfacebook extends auth_plugin_authplain {
         $_SERVER['REMOTE_USER'] = $uinfo['name'];
         $_SESSION[DOKU_COOKIE]['authfacebook']['user'] = $user;
         $_SESSION[DOKU_COOKIE]['authfacebook']['info'] = $USERINFO;
-        trigger_error("plaintextlogin: $user");
+        // trigger_error("plaintextlogin: $user");
         return true;
       } else {
         //invalid credentials - log off
-        trigger_error('plaintextlogin: '.$user.' failed');
+        // trigger_error('plaintextlogin: '.$user.' failed');
         msg($this->getLang('badlogin'),-1);
         return false;
       }
@@ -105,7 +105,7 @@ class auth_plugin_authfacebook extends auth_plugin_authplain {
             }
             if ($me) {
 //              $conf['superuser']   = $this->getConf('superuser');
-              trigger_error(print_r($me,true));
+//              trigger_error(print_r($me,true));
               $USERINFO['name'] = $me['name'];
               $USERINFO['mail'] = $me['email'];
               $USERINFO['is_facebook'] = true;
@@ -120,11 +120,11 @@ class auth_plugin_authfacebook extends auth_plugin_authplain {
               }
               if (in_array($me['id'],json_decode($this->getConf('superuser'))))
                 $USERINFO['grps'][] = 'admin';
-              trigger_error($me['username'].'('.$me['id'].') '.print_r($USERINFO['grps'],true));
+//              trigger_error($me['username'].'('.$me['id'].') '.print_r($USERINFO['grps'],true));
               $user = $me['id'];
               $_SESSION[DOKU_COOKIE]['authfacebook']['userid'] = $user;
               $_SERVER['REMOTE_USER'] = $user;
-              $_SESSION[DOKU_COOKIE]['authfacebook']['user'] = $me['username'];
+              $_SESSION[DOKU_COOKIE]['authfacebook']['user'] = $me['id'];
               $_SESSION[DOKU_COOKIE]['authfacebook']['pass'] = '';
               $_SESSION[DOKU_COOKIE]['authfacebook']['info'] = $USERINFO;
 
