@@ -14,7 +14,6 @@ class MyDokuWikiPersistentDataHandler implements PersistentDataInterface
    */
   public function get($key)
   {
-    trigger_error($key. ". ". $_SESSION[DOKU_COOKIE][$this->sessionPrefix . $key]);
     return $_SESSION[DOKU_COOKIE][$this->sessionPrefix . $key];
   }
 

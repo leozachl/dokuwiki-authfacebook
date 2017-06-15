@@ -6,4 +6,4 @@ $conf['appAdmin'] = '';
 $conf['superuser'] = '[]';
 $conf['fbgid2group'] = '{}';
 $conf['defaultgroup'] = 'facebook';
-$conf['scope'] = 'email,user_groups';
+$conf['scope'] = 'email,user_managed_groups';

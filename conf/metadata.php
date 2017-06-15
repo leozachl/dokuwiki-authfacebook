@@ -11,3 +11,4 @@ $meta['superuser'] = array('string');
 $meta['defaultgroup'] = array('string');
 $meta['fbgid2group'] = array('string');
 $meta['scope'] = array('string');
+$meta['saveAccessKey'] = array('onoff');

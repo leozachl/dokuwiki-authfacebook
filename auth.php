@@ -85,7 +85,7 @@ class auth_plugin_authfacebook extends auth_plugin_authplain {
       $fb = new Facebook\Facebook(array(
         'app_id'      => $appId,
         'app_secret'     => $appSecret,
-        'default_graph_version' => 'v2.3',
+        'default_graph_version' => 'v2.9',
         'persistent_data_handler'     => new MyDokuWikiPersistentDataHandler(),
       ));
       $helper = $fb->getRedirectLoginHelper();
@@ -106,16 +106,19 @@ class auth_plugin_authfacebook extends auth_plugin_authplain {
             }
             if ($response) {
               $me = $response->getGraphUser();
+
               // the FB-App is only allowed to read the groups of the App-Admin
               $response = $fb->get('/me/permissions', $accessToken);
               $permissions = $response->getGraphEdge();
               if ($me['id'] == $this->getConf('appAdmin'))
-                $this->getFacebookGroups($fb,$permissions);
+                $this->getFacebookGroups($fb, $permissions, $accessToken);
+
               $grantedpermissions = array();
-              foreach($permissions['data'] as $permission)
+              foreach($permissions as $permission)
                 if ($permission['status'] == 'granted')
                   $grantedpermissions[] = $permission['permission'];
               $_SESSION[DOKU_COOKIE]['authfacebook']['permissions'] = $grantedpermissions;
+
               $USERINFO['name'] = $me['name'];
               $USERINFO['mail'] = $me['email'];
               $USERINFO['is_facebook'] = true;
@@ -130,10 +133,12 @@ class auth_plugin_authfacebook extends auth_plugin_authplain {
               }
               if (in_array($me['id'],json_decode($this->getConf('superuser'))))
                 $USERINFO['grps'][] = 'admin';
+
               touch(DOKU_CONF.'/fb_ids.php');
               $fb_ids_fd = fopen(DOKU_CONF.'/fb_ids.php','r+');
               $fb_ids_lock = flock($fb_ids_fd, LOCK_EX | LOCK_NB);
               require(DOKU_CONF.'/fb_ids.php');
+
               if (isset($fb_ids[$me['id']])){
                 $user = $fb_ids[$me['id']];
               } else {
@@ -163,6 +168,7 @@ class auth_plugin_authfacebook extends auth_plugin_authplain {
               }
               flock($fb_ids_fd, LOCK_UN);
               fclose($fb_ids_fd);
+
               $_SESSION[DOKU_COOKIE]['authfacebook']['userid'] = $me['id'];
               $_SERVER['REMOTE_USER'] = $user;
               $_SESSION[DOKU_COOKIE]['authfacebook']['user'] = $user;
@@ -182,17 +188,17 @@ class auth_plugin_authfacebook extends auth_plugin_authplain {
           }
         } catch (Exception $e) {
           $_SESSION[DOKU_COOKIE]['authfacebook']['auth_url'] = $helper->getLoginUrl(
-              wl('start',array('do'=>'login'),true, '&'),
-              explode(',',$this->getConf('scope'))
+            wl('start',array('do'=>'login'),true, '&'),
+            explode(',',$this->getConf('scope'))
           );
-          msg('Auth Facebook Error: ' . $e->getMessage());
+          msg('1: Auth Facebook Error: '. $e->getFile() .':'.$e->getLine().': '.$e->getMessage());
         }
       }
 
       if (!isset($_SESSION[DOKU_COOKIE]['authfacebook']['auth_url']))
       $_SESSION[DOKU_COOKIE]['authfacebook']['auth_url'] = $helper->getLoginUrl(
-              wl('start',array('do'=>'login'),true, '&'),
-              explode(',',$this->getConf('scope'))
+        wl('start',array('do'=>'login'),true, '&'),
+        explode(',',$this->getConf('scope'))
       );
     }
 
@@ -213,7 +219,6 @@ class auth_plugin_authfacebook extends auth_plugin_authplain {
             'default_graph_version' => 'v2.3',
             'persistent_data_handler'     => new MyDokuWikiPersistentDataHandler(),
         ));
-        // $fb->destroySession();
     }
     unset($_SESSION[DOKU_COOKIE]['authfacebook']['auth_url']);
   }
@@ -229,14 +234,14 @@ class auth_plugin_authfacebook extends auth_plugin_authplain {
     }
   }
 
-  private function getFacebookGroups($facebook,$permissions){
-    return false;
+  private function getFacebookGroups($facebook,$permissions, $accessToken){
     if ($mapgroups = json_decode($this->getConf('fbgid2group'),true)){
-      foreach($permissions['data'] as $permission){
-        if ($permission['permission'] == 'user_groups' && $permission['status'] == 'granted'){
-          $groups = $facebook->api('/me/groups');
+      foreach($permissions as $permission){
+        if ($permission['permission'] == 'user_managed_groups' && $permission['status'] == 'granted'){
+          $groups = $facebook->get('/me/groups', $accessToken);
+          $groups = $groups->getGraphEdge();
           $usergroups = array();
-          foreach($groups['data'] as $group){
+          foreach($groups as $group){
             $usergroups[$group['id']] = $group['name'];
           }
           if (is_file(DOKU_CONF.'/fb_groups_orig.php'))
@@ -244,13 +249,18 @@ class auth_plugin_authfacebook extends auth_plugin_authplain {
           else
             $fb_groups = array();
           foreach(array_intersect_key($mapgroups,$usergroups) as $groupid => $groupname){
-            $group_members = $facebook->api('/'.$groupid.'/members');
-            if (!empty($group_members['data']))
-              foreach($group_members['data'] as $member)
+            $group_members = $facebook->get('/'.$groupid.'/members', $accessToken);
+            if (!empty($group_members))
+              foreach($group_members as $member)
                 $fb_groups[$groupid][$member['id']] = $member['name'];
 
           }
-          file_put_contents(DOKU_CONF.'/fb_groups.php',"<?php\n\$fb_groups = ".var_export($fb_groups,true).";\n\$fb_token = '".$facebook->getAccessToken()."';\n");
+          if (!empty($this->getConf('saveAccessKey'))){
+            $token = "\$fb_token = '".$accessToken."';\n";
+          } else {
+            $token;
+          }
+          file_put_contents(DOKU_CONF.'/fb_groups.php',"<?php\n\$fb_groups = ".var_export($fb_groups,true).";\n".$token);
         }
       }
     }

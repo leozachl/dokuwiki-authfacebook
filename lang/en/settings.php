@@ -7,3 +7,4 @@ $lang['superuser'] = "json list of Facebook UIDs for Admin-Group ([ID1,ID2])";
 $lang['defaultgroup'] = "Default group for all Facebookusers";
 $lang['fbgid2group'] = 'JSON map of FB Group IDs to DW-groups ({"FbGId1":"group2","FbGId2":"group2"}';
 $lang['scope'] = 'Permissions to request. a nickname ist created from the email-address, user_groups ist essential for FB-DW group mapping! More for other plugins.';
+$lang['saveAccessKey'] = 'Save the AccessKey of the App-Admin for other plugins, e.g. to read or write FB-Group feeds.'; 
