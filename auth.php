@@ -85,7 +85,7 @@ class auth_plugin_authfacebook extends auth_plugin_authplain {
       $fb = new Facebook\Facebook(array(
         'app_id'      => $appId,
         'app_secret'     => $appSecret,
-        'default_graph_version' => 'v2.9',
+        'default_graph_version' => 'v2.12',
         'persistent_data_handler'     => new MyDokuWikiPersistentDataHandler(),
       ));
       $helper = $fb->getRedirectLoginHelper();
